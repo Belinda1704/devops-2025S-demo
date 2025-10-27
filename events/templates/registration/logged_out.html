@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Logged Out - Campus Notifier{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 600px; text-align: center;">
+    <h1 style="margin-bottom: 1.5rem; color: #1D3124;">You've been logged out</h1>
+    
+    <div style="background-color: #BACEC1; color: #1D3124; padding: 2rem; border-radius: 8px; margin-bottom: 2rem;">
+        <p style="font-size: 1.1rem; margin-bottom: 1rem; font-weight: 500;">
+            You have successfully logged out.
+        </p>
+        <p style="opacity: 0.8;">
+            Thank you for using Campus Notifier!
+        </p>
+    </div>
+    
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="{% url 'events:event_list' %}" 
+           style="display: inline-block; background-color: #E59560; color: white; padding: 0.75rem 2rem; border-radius: 4px; text-decoration: none; font-size: 1.1rem; transition: background-color 0.3s;">
+            View Events
+        </a>
+        <a href="{% url 'login' %}" 
+           style="display: inline-block; background-color: #1D3124; color: #F6F4E8; padding: 0.75rem 2rem; border-radius: 4px; text-decoration: none; font-size: 1.1rem; transition: background-color 0.3s;">
+            Login Again
+        </a>
+    </div>
+</div>
+
+<style>
+    a:hover {
+        opacity: 0.9;
+    }
+</style>
+{% endblock %}

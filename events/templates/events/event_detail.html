@@ -1,0 +1,428 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ event.title }} - Campus Notifier{% endblock %}
+
+{% block extra_css %}
+<style>
+    .detail-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    
+    .hero-section {
+        position: relative;
+        width: 100%;
+        height: 350px;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+        background: linear-gradient(135deg, #1D3124 0%, #BACEC1 100%);
+    }
+    
+    .hero-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .hero-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to top, rgba(29, 49, 36, 0.95) 0%, rgba(29, 49, 36, 0.7) 50%, transparent 100%);
+        padding: 2rem;
+        color: #F6F4E8;
+    }
+    
+    .hero-overlay h1 {
+        font-size: 2.5rem;
+        margin: 0 0 0.5rem 0;
+        font-weight: 700;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .hero-category {
+        display: inline-block;
+        background-color: #E59560;
+        color: white;
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    
+    .content-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    @media (max-width: 768px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+        .hero-overlay h1 {
+            font-size: 1.8rem;
+        }
+    }
+    
+    .main-content {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(29, 49, 36, 0.08);
+        border: 1px solid #BACEC1;
+    }
+    
+    .sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .info-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(29, 49, 36, 0.08);
+        border: 1px solid #BACEC1;
+    }
+    
+    .info-card h3 {
+        color: #1D3124;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+    
+    .info-item {
+        display: flex;
+        align-items: start;
+        gap: 0.75rem;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #F6F4E8;
+    }
+    
+    .info-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+    
+    .info-item:first-child {
+        padding-top: 0;
+    }
+    
+    .info-icon {
+        width: 40px;
+        height: 40px;
+        background-color: #F6F4E8;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+        color: #1D3124;
+    }
+    
+    .info-text {
+        flex: 1;
+    }
+    
+    .info-label {
+        font-size: 0.85rem;
+        color: #1D3124;
+        opacity: 0.7;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .info-value {
+        color: #1D3124;
+        font-weight: 500;
+        margin-top: 0.25rem;
+    }
+    
+    .description-section {
+        margin-bottom: 2rem;
+    }
+    
+    .description-section h2 {
+        color: #1D3124;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+    
+    .description-text {
+        color: #1D3124;
+        line-height: 1.8;
+        font-size: 1.05rem;
+    }
+    
+    .action-card {
+        background: linear-gradient(135deg, #E59560 0%, #1D3124 100%);
+        padding: 2rem;
+        border-radius: 12px;
+        color: white;
+        text-align: center;
+    }
+    
+    .action-card.registered {
+        background: linear-gradient(135deg, #BACEC1 0%, #1D3124 100%);
+    }
+    
+    .action-button {
+        background-color: white;
+        color: #1D3124;
+        border: none;
+        padding: 1rem 2.5rem;
+        font-size: 1.1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .action-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    }
+    
+    .action-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+    
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #E59560;
+        text-decoration: none;
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+        transition: gap 0.3s;
+    }
+    
+    .back-link:hover {
+        gap: 0.75rem;
+    }
+    
+    .warning-banner {
+        background-color: #FFF4E6;
+        border-left: 4px solid #E59560;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+    }
+    
+    .warning-banner strong {
+        color: #1D3124;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+    
+    .warning-banner span {
+        color: #1D3124;
+        font-size: 0.95rem;
+    }
+    
+    .meta-info {
+        display: flex;
+        gap: 1rem;
+        padding-top: 1.5rem;
+        margin-top: 1.5rem;
+        border-top: 1px solid #F6F4E8;
+        font-size: 0.85rem;
+        color: #1D3124;
+        opacity: 0.6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <a href="{% url 'events:event_list' %}" class="back-link">
+        <span>&larr;</span> Back to Events
+    </a>
+    
+    <!-- Hero Section -->
+    <div class="hero-section">
+        {% if event.image_url %}
+            <img src="{{ event.image_url }}" alt="{{ event.title }}" class="hero-image">
+        {% endif %}
+        <div class="hero-overlay">
+            {% if event.category %}
+                <div class="hero-category">{{ event.category.name }}</div>
+            {% endif %}
+            <h1>{{ event.title }}</h1>
+        </div>
+    </div>
+    
+    <!-- Content Grid -->
+    <div class="content-grid">
+        <!-- Main Content -->
+        <div class="main-content">
+            {% if event.registration_required %}
+            <div class="warning-banner">
+                <strong>Registration Required</strong>
+                {% if event.max_participants %}
+                    <span>Limited to {{ event.max_participants }} participants.</span>
+                {% endif %}
+                {% if event.registration_deadline %}
+                    <span>Register by {{ event.registration_deadline|date:"M d, Y - g:i A" }}.</span>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <div class="description-section">
+                <h2>About This Event</h2>
+                <div class="description-text">
+                    {{ event.description|linebreaks }}
+                </div>
+            </div>
+            
+            <div class="meta-info">
+                <span>Created {{ event.created_at|date:"F d, Y" }}</span>
+                {% if event.updated_at != event.created_at %}
+                    <span>•</span>
+                    <span>Updated {{ event.updated_at|date:"F d, Y" }}</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Event Details Card -->
+            <div class="info-card">
+                <h3>Event Details</h3>
+                
+                <div class="info-item">
+                    <div class="info-icon">📅</div>
+                    <div class="info-text">
+                        <div class="info-label">Date</div>
+                        <div class="info-value">{{ event.start_datetime|date:"l, F d, Y" }}</div>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-icon">🕐</div>
+                    <div class="info-text">
+                        <div class="info-label">Time</div>
+                        <div class="info-value">
+                            {{ event.start_datetime|date:"g:i A" }} - {{ event.end_datetime|date:"g:i A" }}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-icon">📍</div>
+                    <div class="info-text">
+                        <div class="info-label">Location</div>
+                        <div class="info-value">{{ event.location }}</div>
+                    </div>
+                </div>
+                
+                {% if event.organizer %}
+                <div class="info-item">
+                    <div class="info-icon">👤</div>
+                    <div class="info-text">
+                        <div class="info-label">Organizer</div>
+                        <div class="info-value">
+                            {{ event.organizer.get_full_name|default:event.organizer.username }}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Registration Card -->
+            {% if user.is_authenticated and event.registration_required %}
+                {% if is_registered %}
+                    <div class="action-card registered">
+                        <div style="font-size: 3rem; margin-bottom: 0.5rem;">✓</div>
+                        <h3 style="margin: 0 0 0.5rem 0;">You're Registered!</h3>
+                        <p style="margin: 0; opacity: 0.9; font-size: 0.95rem;">
+                            We'll send you a reminder before the event starts.
+                        </p>
+                    </div>
+                {% else %}
+                    <div class="action-card">
+                        <h3 style="margin: 0 0 1rem 0;">Ready to Join?</h3>
+                        <button id="registerBtn" onclick="registerForEvent({{ event.id }})" class="action-button">
+                            Register Now
+                        </button>
+                        <div id="registerMessage" style="margin-top: 1rem;"></div>
+                    </div>
+                {% endif %}
+            {% elif not user.is_authenticated and event.registration_required %}
+                <div class="action-card">
+                    <h3 style="margin: 0 0 1rem 0;">Join This Event</h3>
+                    <p style="margin: 0 0 1.5rem 0; opacity: 0.9;">
+                        Please login to register for this event
+                    </p>
+                    <a href="{% url 'login' %}?next={{ request.path }}" class="action-button" style="display: inline-block; text-decoration: none;">
+                        Login to Register
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if user.is_authenticated and event.registration_required and not is_registered %}
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function registerForEvent(eventId) {
+        const btn = document.getElementById('registerBtn');
+        const messageDiv = document.getElementById('registerMessage');
+        
+        btn.disabled = true;
+        btn.textContent = 'Registering...';
+        
+        fetch(`/${eventId}/register/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                messageDiv.innerHTML = '<div style="padding: 1rem; background-color: rgba(255,255,255,0.2); color: white; border-radius: 8px; font-weight: 500;">' + data.message + '</div>';
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                messageDiv.innerHTML = '<div style="padding: 1rem; background-color: rgba(255,255,255,0.2); color: white; border-radius: 8px;">' + data.message + '</div>';
+                btn.disabled = false;
+                btn.textContent = 'Register Now';
+            }
+        })
+        .catch(error => {
+            messageDiv.innerHTML = '<div style="padding: 1rem; background-color: rgba(255,255,255,0.2); color: white; border-radius: 8px;">An error occurred. Please try again.</div>';
+            btn.disabled = false;
+            btn.textContent = 'Register Now';
+        });
+    }
+</script>
+{% endif %}
+{% endblock %}

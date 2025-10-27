@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}My Events - Campus Notifier{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 style="margin-bottom: 1.5rem; color: #1D3124;">My Registered Events</h1>
+    
+    {% if registrations %}
+        <div class="event-list">
+            {% for registration in registrations %}
+                {% with event=registration.event %}
+                <div class="event-card" style="border: 1px solid #BACEC1; border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem; background-color: white;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 1rem;">
+                        <h2 style="color: #1D3124; margin: 0;">
+                            <a href="{% url 'events:event_detail' event.id %}" style="color: #1D3124; text-decoration: none;">
+                                {{ event.title }}
+                            </a>
+                        </h2>
+                        {% if registration.attended %}
+                            <span style="background-color: #BACEC1; color: #1D3124; padding: 0.3rem 0.8rem; border-radius: 4px; font-size: 0.85rem; font-weight: 500;">
+                                Attended
+                            </span>
+                        {% else %}
+                            <span style="background-color: #E59560; color: white; padding: 0.3rem 0.8rem; border-radius: 4px; font-size: 0.85rem; font-weight: 500;">
+                                Registered
+                            </span>
+                        {% endif %}
+                    </div>
+                    
+                    <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 0.5rem; color: #1D3124; font-size: 0.95rem;">
+                        <div style="display: flex; align-items: center; gap: 0.3rem;">
+                            <strong>Date:</strong>
+                            <span>{{ event.start_datetime|date:"M d, Y - g:i A" }}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.3rem;">
+                            <strong>Location:</strong>
+                            <span>{{ event.location }}</span>
+                        </div>
+                        {% if event.category %}
+                        <div style="display: flex; align-items: center; gap: 0.3rem;">
+                            <span style="background-color: #F6F4E8; color: #1D3124; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.85rem;">
+                                {{ event.category.name }}
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <p style="color: #1D3124; font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.7;">
+                        Registered on: {{ registration.registered_at|date:"M d, Y - g:i A" }}
+                    </p>
+                    
+                    <div style="margin-top: 1rem;">
+                        <a href="{% url 'events:event_detail' event.id %}" 
+                           style="display: inline-block; background-color: #E59560; color: white; padding: 0.5rem 1.5rem; border-radius: 4px; text-decoration: none; transition: background-color 0.3s;">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+                {% endwith %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 3rem; background-color: #F6F4E8; border-radius: 8px; border: 1px solid #BACEC1;">
+            <p style="font-size: 1.2rem; color: #1D3124; margin-bottom: 1rem;">
+                You haven't registered for any events yet.
+            </p>
+            <a href="{% url 'events:event_list' %}" 
+               style="display: inline-block; background-color: #E59560; color: white; padding: 0.75rem 2rem; border-radius: 4px; text-decoration: none; font-size: 1.1rem; transition: background-color 0.3s;">
+                Browse Upcoming Events
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .event-card:hover {
+        box-shadow: 0 4px 15px rgba(29, 49, 36, 0.15);
+    }
+    
+    .event-card a:hover {
+        text-decoration: underline;
+    }
+    
+    .event-card > div:last-child a:hover {
+        background-color: #1D3124;
+    }
+</style>
+{% endblock %}
