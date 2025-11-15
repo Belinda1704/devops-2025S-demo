@@ -1,0 +1,53 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  docker-build-push:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    env:
+      IMAGE_NAME: my-image
+      IMAGE_TAG: ${{ github.sha }}
+      AWS_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker Image
+        run: |
+          docker build -t ${IMAGE_NAME}:latest .
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push image to Amazon ECR
+        run: |
+          if [ -z "${ECR_REGISTRY}" ]; then
+            echo "Error: ECR_REGISTRY secret not set. Please set it to your terraform output ecr_repository_url"
+            echo "Run: terraform output ecr_repository_url"
+            exit 1
+          fi
+          docker tag ${IMAGE_NAME}:latest ${ECR_REGISTRY}:${IMAGE_TAG}
+          docker push ${ECR_REGISTRY}:${IMAGE_TAG}
+          echo "Successfully pushed ${ECR_REGISTRY}:${IMAGE_TAG}"
+
