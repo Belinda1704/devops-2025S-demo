@@ -107,3 +107,21 @@ Optionally, remove the local image:
 docker rmi my-k8s-app:latest
 ```
 
+## DevSecOps: Automated Security Scans
+
+The GitHub Actions pipeline now runs three security scans on every push:
+
+1. **Container Scan (Trivy)** – runs immediately after the Docker image build to block images with Critical or High CVEs.
+2. **Infrastructure Scan (tfsec)** – separate job that reviews the Terraform files in `terraform/` for risky configurations (e.g., open security groups).
+3. **Dependency Scan (Snyk)** – uses `requirements.txt` to detect vulnerable Python dependencies and reports them to the Snyk dashboard (requires `SNYK_TOKEN` secret).
+
+Make sure the following secrets exist in the repository:
+
+- `AWS_ACCESS_KEY_ID`
+- `AWS_SECRET_ACCESS_KEY`
+- `AWS_DEFAULT_REGION`
+- `ECR_REGISTRY`
+- `SNYK_TOKEN`
+
+View the combined results in the **Actions** tab (both jobs) and in the Snyk dashboard for historic dependency reports.
+

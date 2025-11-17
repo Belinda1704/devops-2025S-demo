@@ -14,7 +14,7 @@ jobs:
       id-token: write
 
     env:
-      IMAGE_NAME: my-image
+      IMAGE_NAME: my-app
       IMAGE_TAG: ${{ github.sha }}
       AWS_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
       ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
@@ -23,12 +23,36 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Scan application dependencies
+        uses: snyk/actions/python-3.10@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: "monitor"
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Build Docker Image
         run: |
           docker build -t ${IMAGE_NAME}:latest .
+
+      - name: Scan Docker image for vulnerabilities
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: "${{ env.IMAGE_NAME }}:latest"
+          format: "table"
+          exit-code: "1"
+          ignore-unfixed: true
+          severity: "CRITICAL,HIGH"
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -50,4 +74,17 @@ jobs:
           docker tag ${IMAGE_NAME}:latest ${ECR_REGISTRY}:${IMAGE_TAG}
           docker push ${ECR_REGISTRY}:${IMAGE_TAG}
           echo "Successfully pushed ${ECR_REGISTRY}:${IMAGE_TAG}"
+
+  scan-infrastructure:
+    name: Scan Terraform Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Scan Terraform code
+        uses: aquasecurity/tfsec-action@v1.0.0
+        with:
+          working_directory: terraform/
+      
 
