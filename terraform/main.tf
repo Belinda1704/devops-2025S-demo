@@ -13,6 +13,12 @@ provider "aws" {
 
 resource "aws_ecr_repository" "app_repo" {
   name = "practice-app-repo"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  image_tag_mutability = "IMMUTABLE"
 }
 
 output "ecr_repository_url" {
